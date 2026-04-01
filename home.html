@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Gerenciador de Tempo</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #e9ecef; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { margin-top: 0; color: #333; text-align: center; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        input[type="text"] { flex: 2; }
+        input[type="number"] { width: 70px; }
+        button#addBtn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        ul { list-style: none; padding: 0; }
+        li { background: #f8f9fa; padding: 10px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007bff; }
+        .btn-del { background: #dc3545; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 12px; }
+        .total-container { border-top: 2px solid #eee; margin-top: 15px; padding-top: 15px; font-size: 1.2rem; font-weight: bold; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🎯 Meus Objetivos</h2>
+    
+    <div class="input-group">
+        <input type="text" id="objInput" placeholder="Objetivo...">
+        <input type="number" id="hrInput" placeholder="Hrs" min="0">
+    </div>
+    <button id="addBtn" onclick="adicionar()">Adicionar Meta</button>
+
+    <ul id="lista"></ul>
+
+    <div class="total-container">
+        <span>Total Acumulado:</span>
+        <span id="totalDisplay">0h</span>
+    </div>
+</div>
+
+<script>
+    let objetivos = JSON.parse(localStorage.getItem('meusObjetivos')) || [];
+
+    function renderizar() {
+        const lista = document.getElementById('lista');
+        const totalDisplay = document.getElementById('totalDisplay');
+        lista.innerHTML = '';
+        let soma = 0;
+
+        objetivos.forEach((item, index) => {
+            soma += item.horas;
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${item.nome} (<strong>${item.horas}h</strong>)</span>
+                <button class="btn-del" onclick="remover(${index})">Remover</button>
+            `;
+            lista.appendChild(li);
+        });
+
+        totalDisplay.innerText = soma + 'h';
+        localStorage.setItem('meusObjetivos', JSON.stringify(objetivos));
+    }
+
+    function adicionar() {
+        const nome = document.getElementById('objInput').value;
+        const horas = parseFloat(document.getElementById('hrInput').value);
+
+        if (nome && !isNaN(horas)) {
+            objetivos.push({ nome, horas });
+            document.getElementById('objInput').value = '';
+            document.getElementById('hrInput').value = '';
+            renderizar();
+        } else {
+            alert("Preencha os campos corretamente!");
+        }
+    }
+
+    function remover(index) {
+        objetivos.splice(index, 1);
+        renderizar();
+    }
+
+    // Carregar dados ao abrir a página
+    renderizar();
+</script>
+
+</body>
+</html>
